@@ -17,9 +17,13 @@ const datasets = _.merge(...datasetFiles.map(f => require(`dataset/${f}`)));
 
 // build a dataset to query table
 const ds2query = Object.entries(queries).reduce(function (acc, [name, {dataset}]) {
-  const arr = (acc[dataset] || []);
-  arr.push(name);
-  acc[dataset] = arr;
+  // TODO add the option to specify a regular expression to select multiple data sets
+  const ds = Array.isArray(dataset) ? dataset : [dataset];
+  for (const d of ds) {
+    const arr = (acc[d] || []);
+    arr.push(name);
+    acc[d] = arr;
+  }
   return acc;
 }, {});
 
@@ -35,7 +39,7 @@ const ds2deps = Object.entries(datasets).reduce(function (acc, [name, {extend}])
 
 const root = Object.entries(datasets).filter(([name, ds]) => (ds.extend === undefined)).map(x => x[0]);
 
-const results = {};
+const results = [];
 
 const execute = function (list) {
 
@@ -43,7 +47,7 @@ const execute = function (list) {
     print(`Setting up ${ds}`);
     datasets[ds].setUp();
     try {
-      for (const qn of ds2query[ds]) {
+      for (const qn of ds2query[ds] || []) {
         print(`Running query ${qn}`);
         const q = queries[qn];
         const opts = q.options || {};
@@ -58,7 +62,7 @@ const execute = function (list) {
           }).execute().getExtra();
           sum = result.profile.executing;
         }
-        results[qn] = sum / 5.;
+        results.push([qn, ds, sum / 5.]);
       }
 
       execute(ds2deps[ds] || []);
@@ -72,8 +76,8 @@ const execute = function (list) {
 execute(root);
 
 const tbl = new ascii('Results');
-tbl.setHeading('Query', 'Time');
-for (const [q, t] of _.sortBy(Object.entries(results), x => x[0])) {
-  tbl.addRow(q, t);
+tbl.setHeading('query', 'data set', 'time');
+for (const x of _.sortBy(results, x => x[0])) {
+  tbl.addRow(...x);
 }
 print(tbl.toString());

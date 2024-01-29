@@ -2,6 +2,7 @@
 
 
 exports.fillCollection = function (c, n, g) {
+  // TODO use parallel insert code
   let docs = [];
   for (let k = 0; k < n; k++) {
     docs.push(g(k));

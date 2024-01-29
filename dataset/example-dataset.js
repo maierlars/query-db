@@ -1,4 +1,3 @@
-/*jshint strict: true */
 'use strict';
 
 const {db} = require('@arangodb');
