@@ -12,6 +12,8 @@ const queriesFiles = scanDir("query");
 const queries = _.merge(...queriesFiles.map(f => require(`query/${f}`)));
 const datasets = _.merge(...datasetFiles.map(f => require(`dataset/${f}`)));
 
+// TODO check if queries reference datasets that don't exist
+// TODO check if other datasets reference datasets that don't exist
 
 // build a dataset to query table
 const ds2query = Object.entries(queries).reduce(function (acc, [name, {dataset}]) {
