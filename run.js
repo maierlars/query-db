@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const _ = require('lodash');
+const ascii = require('ascii-table');
 
 const scanDir = dir => fs.listTree(dir).filter(x => x.endsWith(".js"));
 
@@ -32,6 +33,8 @@ const ds2deps = Object.entries(datasets).reduce(function (acc, [name, {extend}])
 
 const root = Object.entries(datasets).filter(([name, ds]) => (ds.extend === undefined)).map(x => x[0]);
 
+const results = {};
+
 const execute = function (list) {
 
   for (const ds of list) {
@@ -41,7 +44,19 @@ const execute = function (list) {
       for (const qn of ds2query[ds]) {
         print(`Running query ${qn}`);
         const q = queries[qn];
-        db._profileQuery(q);
+        const opts = q.options || {};
+        opts.profile = 4;
+
+        let sum = 0;
+        for (let k = 0; k < 5; k++) {
+          const result = db._createStatement({
+            query: q.query,
+            bindVars: q.bindVars,
+            options: opts
+          }).execute().getExtra();
+          sum = result.profile.executing;
+        }
+        results[qn] = sum / 5.;
       }
 
       execute(ds2deps[ds] || []);
@@ -53,3 +68,10 @@ const execute = function (list) {
 };
 
 execute(root);
+
+const tbl = new ascii('Results');
+tbl.setHeading('Query', 'Time');
+for (const [q, t] of _.sortBy(Object.entries(results), x => x[0])) {
+  tbl.addRow(q, t);
+}
+print(tbl.toString());
