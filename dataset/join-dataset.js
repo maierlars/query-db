@@ -5,7 +5,7 @@ const {fillCollection} = require('utils');
 
 const database = "MyJoinDatabase";
 const indexName = "MyIndex";
-const numDocuments = 1000000;
+const numDocuments = 100000;
 
 exports["join-data-set-1-1-base"] = {
   setUp: function () {

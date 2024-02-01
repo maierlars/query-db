@@ -6,7 +6,7 @@ const query = `
         RETURN doc.value
     `;
 
-exports["unique-query-identifier"] = {
-  dataset: ["example-data-set", "example-data-set-2"],
+exports["mdi-query-all"] = {
+  selectDatasets: ds => ds.filter(({name}) => name.includes('mdi')),
   create: () => ({query}),
 };
