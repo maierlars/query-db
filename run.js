@@ -34,12 +34,9 @@ const executeQueryProfiler = function (dataset, query) {
     runs.push(result.profile.executing);
   }
 
-  return [runs, _.sum(runs)];
+  return [runs, _.mean(runs)];
 };
 
-
 const result = util.executeLinearPlan(datasets, queries, linearPlan, executeQueryProfiler, {dryRun: false});
-
-
 
 util.displayResults(result);

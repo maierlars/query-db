@@ -211,7 +211,7 @@ exports.executeLinearPlan = function (datasets, queries, plan, handler, options 
 
 exports.displayResults = function (results) {
   const tbl = new ascii('Results');
-  tbl.setHeading('query', 'data set', 'time')
+  tbl.setHeading('data set', 'query', 'time')
       .setAlign(2, ascii.RIGHT);
   for (const x of results) {
     tbl.addRow(_.last(x[0]), x[1], x[3].toFixed(4));
